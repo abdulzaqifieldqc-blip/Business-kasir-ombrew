@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -23,16 +23,16 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+
       - name: Extract Projects
         run: |
           mkdir -p project/hp project/tablet
           unzip -q OMBREW-APK-Project.zip -d project/hp
           unzip -q OMBREW-Tablet-APK-Project.zip -d project/tablet
-
-      - name: Setup Android SDK
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build APK HP
         run: |

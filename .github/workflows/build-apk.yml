@@ -1,5 +1,5 @@
 
-name: Build APK OMBREW
+name: Build OMBREW HP dan Tablet
 
 on:
   workflow_dispatch:
@@ -9,12 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Extract OMBREW ZIP
-        run: |
-          unzip -q OMBREW-APK-Project.zip -d project
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -27,19 +23,35 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Check Android SDK
+      - name: Extract Projects
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          test -d "$ANDROID_HOME"
-          yes | sdkmanager --licenses || true
+          mkdir -p project/hp project/tablet
+          unzip -q OMBREW-APK-Project.zip -d project/hp
+          unzip -q OMBREW-Tablet-APK-Project.zip -d project/tablet
 
-      - name: Build OMBREW APK
+      - name: Setup Android SDK
         run: |
-          cd project/ombrew
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build APK HP
+        run: |
+          cd project/hp/ombrew
           bash build-apk.sh
 
-      - name: Upload APK
+      - name: Build APK Tablet
+        run: |
+          cd project/tablet/ombrew-tablet-pkg
+          bash build-apk.sh
+
+      - name: Upload APK HP
         uses: actions/upload-artifact@v4
         with:
-          name: OMBREW-apk
-          path: project/ombrew/OMBREW.apk
+          name: OMBREW-HP
+          path: project/hp/ombrew/OMBREW.apk
+
+      - name: Upload APK Tablet
+        uses: actions/upload-artifact@v4
+        with:
+          name: OMBREW-TABLET
+          path: project/tablet/ombrew-tablet-pkg/OMBREW-Tablet.apk

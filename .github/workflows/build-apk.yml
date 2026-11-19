@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract ZIP
+      - name: Extract OMBREW ZIP
         run: |
           unzip -q OMBREW-APK-Project.zip -d project
 
@@ -27,8 +27,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Check Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME"
+          yes | sdkmanager --licenses || true
 
       - name: Build OMBREW APK
         run: |
